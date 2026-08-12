@@ -1,17 +1,65 @@
 <!DOCTYPE html>
-<html>
-
+<html lang="en">
 <head>
-  <meta charset="utf-8">
-  <meta name="viewport" content="width=device-width">
-  <title>replit</title>
-  <link href="style.css" rel="stylesheet" type="text/css" />
+  <meta charset="UTF-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=Edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+
+  <title>kelal-test</title>
+  <link rel="stylesheet" href="kelal.css">
 </head>
 
-<body id="App">
-  <script src="kelal.js"></script>
-  <script src="script.js"></script>
-  <script src="https://replit.com/public/js/replit-badge.js" theme="blue" defer></script> 
-</body>
+<body>
+  
+  <card 
+  style="--theme:dark" 
+  class="self-center">
+    
+    <h2 class="block self-center">Sing-in</h2>
+    <content class="center">
 
+      <input 
+      type="text" 
+      name="username" 
+      placeholder="@username"
+      class="block"/>
+      <input 
+      type="password" 
+      name="password" 
+      placeholder="xxxxx"
+      class="block">
+
+      <div class="flex center">
+        <a href="#" class="fade pop">sign up</a> 
+          <hr />
+        <button class="pop bg-prime">
+         sign in
+        </button>
+      </div>
+    </content>
+  </card>
+  
+  <glass class="self-center center">
+    <input 
+      type="text" 
+      name="username" 
+      placeholder="@username"
+      class="block pop"/>
+      <input 
+      type="password" 
+      name="password" 
+      placeholder="xxxxx"
+      class="block pop">
+
+      <div class="flex center">
+        <a href="#" class="fade pop">sign up</a> 
+          <hr />
+        <button class="pop bg-prime">
+         sign in
+        </button>
+      </div>
+  </glass>
+
+  <script src="kelal.js"></script>
+</body>
 </html>

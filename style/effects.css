@@ -1,0 +1,3 @@
+/* --- Effects & Animations --- */
+.pop:active { transform: scale(0.95); }
+.fade:active { filter: brightness(1.2); }

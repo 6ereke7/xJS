@@ -1,0 +1,46 @@
+:root {
+  --theme: light;
+  --color: #111827; /* sleek dark slate for text */
+  
+  --prime: #4f46e5;
+  --prime-hover: #4338ca;
+  --second: #64748b;
+  
+  /* Status Colors */
+  --error: #ef4444;    
+  --success: #10b981;
+  
+  /* Backgrounds & Surfaces */
+  --bg: #f8fafc;
+  --surface: #ffffff;
+  
+  /* Fluid Sizing Engine */
+  --x: min(1.5vh, 1.5vw);
+  --y: min(3vh, 3vw);
+  --z: min(4.5vh, 4.5vw);
+  
+  --font-big: var(--z);
+  --font-mid: var(--y);
+  --font-min: var(--x);
+  --font-fam: sans-serif;
+}
+
+/* Dark theme toggle override hook */
+[data-theme="dark"]{
+  --theme: dark;
+  --color: #f8fafc;
+  --bg: #0f172a;
+  --surface: #1e293b;
+  --second: #475569;
+}
+body {
+  padding: 0;
+  margin: 0;
+  font-family: var(--font-fam);
+  color: var(--color);
+}
+
+/* Base Font Scaling (excluding structural elements) */
+:not(h1, h2, h3, h4, h5, h6, span) {
+  font-size: var(--font-mid);
+}

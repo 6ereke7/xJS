@@ -1,0 +1,42 @@
+/* --- Background Colors --- */
+.bg-prime { background-color: var(--prime); color: #fff; }
+.bg-second { background-color: var(--second); color: #fff; }
+.bg-error { background-color: var(--error); color: #fff; }
+.bg-success { background-color: var(--success); color: #fff; }
+.bg-white { background-color: #fff; color: #000; }
+.bg-black { background-color: #000; color: #fff; }
+
+/* --- Text Colors --- */
+.prime { color: var(--prime); }
+.second { color: var(--second); }
+.error { color: var(--error); }
+.success { color: var(--success); }
+.white { color: #fff; }
+.black { color: #000; }
+
+/* --- Display & Visibility --- */
+.hidden { display: none !important; }
+.block { display: block !important; }
+.inline { display: inline !important; }
+.flex { display: flex !important; }
+.grid { display: grid !important; }
+
+/* position */
+.relative {position: relative;}
+
+/* --- Spacing Helpers --- */
+.m-0 { margin: 0 !important; }
+.p-0 { padding: 0 !important; }
+.my-auto { margin-top: auto !important; margin-bottom: auto !important; }
+.mx-auto { margin-left: auto !important; margin-right: auto !important; }
+
+/* --- Text Alignment & Styling --- */
+.text-left { text-align: left; }
+.text-center { text-align: center; }
+.text-right { text-align: right; }
+.font-bold { font-weight: 700; }
+.font-medium { font-weight: 500; }
+
+/* --- Quick Sizing & Widths --- */
+.w-full { width: 100%; }
+.h-full { height: 100%; }

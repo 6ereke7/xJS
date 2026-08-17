@@ -1,0 +1,38 @@
+.table-container {
+  width: 100%;
+  overflow-x: auto;
+  border: 1px solid rgba(125, 125, 125, 0.2);
+  border-radius: var(--x);
+  background: var(--surface);
+}
+
+.table {
+  width: 100%;
+  border-collapse: collapse;
+  text-align: left;
+  font-size: var(--font-mid);
+  color: var(--color);
+}
+
+.table th, .table td {
+  padding: calc(var(--x) * 0.75) var(--x);
+  border-bottom: 1px solid rgba(125, 125, 125, 0.1);
+}
+
+.table th {
+  font-weight: 600;
+  background: rgba(125, 125, 125, 0.05);
+}
+
+.table tr:last-child td {
+  border-bottom: none;
+}
+
+/* Optional modifiers */
+.table-striped tbody tr:nth-child(even) {
+  background: rgba(125, 125, 125, 0.03);
+}
+
+.table-hover tbody tr:hover {
+  background: rgba(79, 70, 229, 0.04);
+}

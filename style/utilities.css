@@ -39,4 +39,5 @@
 
 /* --- Quick Sizing & Widths --- */
 .w-full { width: 100%; }
+.w-content {width: fit-content;}
 .h-full { height: 100%; }

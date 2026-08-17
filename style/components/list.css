@@ -1,0 +1,30 @@
+.list-group {
+  display: flex;
+  flex-direction: column;
+  background: var(--surface);
+  border: 1px solid rgba(125, 125, 125, 0.2);
+  border-radius: var(--x);
+  overflow: hidden;
+}
+
+.list-item {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: calc(var(--x) * 0.75) var(--x);
+  font-size: var(--font-mid);
+  color: var(--color);
+  border-bottom: 1px solid rgba(125, 125, 125, 0.1);
+  text-decoration: none;
+  transition: background-color 0.15s ease, color 0.15s ease;
+}
+
+.list-item:last-child {
+  border-bottom: none;
+}
+
+/* If the list item is interactive (link or button) */
+a.list-item:hover, button.list-item:hover {
+  background: rgba(79, 70, 229, 0.08);
+  color: var(--prime);
+}

@@ -38,9 +38,10 @@ body {
   margin: 0;
   font-family: var(--font-fam);
   color: var(--color);
+  background: var(--bg);
 }
 
 /* Base Font Scaling (excluding structural elements) */
-:not(h1, h2, h3, h4, h5, h6, span) {
+:not(h1, h2, h3, h4, h5, h6, span, sub, sup) {
   font-size: var(--font-mid);
 }

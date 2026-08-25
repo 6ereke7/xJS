@@ -1,0 +1,24 @@
+{
+  "name": "xjs",
+  "version": "1.0.0",
+  "description": "xJS",
+  "homepage": "https://github.com/6ereke7/xJS#readme",
+  "bugs": {
+    "url": "https://github.com/6ereke7/xJS/issues"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/6ereke7/xJS.git"
+  },
+  "license": "ISC",
+  "author": "Bereket Tadese",
+  "type": "commonjs",
+  "main": "dist/index.js",
+  "scripts": {
+    "test": "echo 'no test'",
+    "build": "node ./node_modules/typescript/bin/tsc"
+  },
+  "devDependencies": {
+    "typescript": "^5.9.3"
+  }
+}

@@ -1,5 +1,5 @@
 export class Route {
-  constructor() {
+  constructor() { 
     this.groups = {};
     // Keep track of the currently active path for each group
     this.activeGroupPaths = {};

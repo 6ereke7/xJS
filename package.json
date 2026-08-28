@@ -15,7 +15,7 @@
   "type": "commonjs",
   "main": "dist/index.js",
   "scripts": {
-    "test": "echo 'no test'",
+    "test": "npm run build && node --test \"test/**/*.test.cjs\"",
     "build": "node ./node_modules/typescript/bin/tsc"
   },
   "devDependencies": {

@@ -1,0 +1,154 @@
+xJS - Mini Documentation
+=========================
+
+What is xJS?
+------------
+xJS is a lightweight JavaScript/TypeScript framework for front-end developers.
+Its goal is to eliminate the need for long JS files and the hassle of installing
+many npm packages, providing a declarative, HTML-first way to build
+UI components with minimal ceremony.
+
+xJS is built to work directly in the browser using native Web Components and a
+small, reactive state manager (sm).
+
+Tech Stack
+----------
+- Language: TypeScript
+- Build: tsc (run `npm run build`)
+- Runtime: Browser (Web Components, Custom Elements)
+- Validation: manual testing via ./test/index.html
+
+Project Structure
+-----------------
+- src/    - main source code (state.ts, customElements.ts, x-bind.ts, domReady.ts)
+- dist/   - compiled build output (what browsers actually use)
+- test/   - demo HTML (index.html) plus the fragment files it loads
+
+State Management (src/state.ts)
+------------------------------
+A tiny reactive store exposed as `sm`.
+
+Creating and reading state:
+  sm.new('name', { value: 'hello' })
+  sm('name').get()          // -> 'hello'
+
+Updating state and subscribing to changes:
+  sm('name').set('world')   // triggers subscribers
+
+Subscribing (type "normal" gets the new value):
+  sm('name').sub({ type: 'normal', update: (v) => {...}, args: [] })
+
+Derived / dependent state (recomputes when its deps change):
+  sm.new('x', { compute: () => sm('y').get() + 1, deps: [sm('y')] })
+
+Deleting state:
+  sm.del('name')
+
+Custom Elements (src/customElements.ts)
+---------------------------------------
+Declarative, HTML-first custom elements. Use them directly in HTML.
+
+1. <x-include src="...">
+   Loads an external HTML fragment and inlines it.
+
+   <x-include src="header.html"></x-include>
+
+   Features:
+   - Fetches the file and injects its contents.
+   - Auto-aborts an in-flight request when removed from the DOM.
+
+2. <x-component>
+   Defines a reusable custom element from a template with prop placeholders.
+
+   <x-component name="greeting" props="Name">
+     <h1>Hello, $Name!</h1>
+   </x-component>
+
+   Then use it anywhere:
+   <greeting Name="World"></greeting>   <!-- renders: Hello, World! -->
+
+   Rules:
+   - `name`  - the new custom element tag name.
+   - `props` - comma-separated prop names; $PropName in the template is
+               replaced with the matching attribute value.
+   - Missing prop attribute -> empty string.
+   - Unknown $X placeholders are left untouched.
+   - Substitution is case-sensitive.
+   - The template is saved once, so re-renders are idempotent.
+
+3. <x-if>
+   Conditionally shows/hides its content, and is reactive to state changes.
+
+   <x-if condition="sm('isOpen').get()" x-bind="isOpen">
+     Panel content
+   </x-if>
+
+   Rules:
+   - `condition` - an expression evaluated with `sm` available.
+   - `x-bind`    - comma-separated state names. The element re-evaluates the
+                   condition whenever any of these states change.
+   - Content is toggled via the `hidden` attribute (remains in the DOM).
+
+4. <x-for>
+   Loops over an iterable and renders its template per item, reactive to state.
+
+   <x-for from="sm('items').get()" as="item" x-bind="items">
+     <p>$item - #$index</p>
+   </x-for>
+
+   Rules:
+   - `from`  - expression returning an iterable (commonly sm(...).get()).
+   - `as`    - placeholder for the current item ($item); defaults to `val`
+               so $val works out of the box.
+   - `$index`- zero-based index placeholder.
+   - `x-bind`- comma-separated state names; the list rebuilds when these
+               states change.
+   - The list rebuild is idempotent (rebuilds from the saved template).
+
+5. x-bind / x-model (data binding)
+   Text binding and two-way binding are driven by a single DOM pass.
+
+   Text binding (one-way, state -> DOM):
+     <p x-bind="name">Hello, $name!</p>
+
+   Two-way binding (state <-> input):
+     <input type="text" x-model="username">
+
+   Rules:
+   - `x-bind` - comma-separated state names; each `$StateName` in the
+                element's text is replaced with the state's value and kept
+                in sync whenever that state changes.
+   - `x-model` - binds a single state to a form control's value:
+       * state -> input: seeds the value and reflects external sets.
+       * input -> state: keeps state in sync on the `input` event.
+       * Equality guards prevent redundant/looping sets.
+   - Supported for text-like inputs and <textarea>.
+   - Radio, checkbox, and <select> are NOT supported yet; they are skipped
+     (a console warning is logged).
+   - A missing state logs a warning and is skipped without crashing.
+
+Usage Notes
+-----------
+- All elements are registered automatically on import.
+- Reactive elements hydrate from the referenced state; when that state
+  changes, they re-render on their own.
+- unsub on disconnect is not yet implemented; subscribe/unsubscribe cleanup
+  is planned for a future version.
+
+Commands
+--------
+- npm run build  - compile src/ with tsc into dist/ then bundle with esbuild
+
+Manual Testing
+--------------
+- This project ships no automated tests.
+- Every feature and every possible case is demonstrated in ./test/index.html
+  and verified by hand in a browser (serve ./test over http; the x-include
+  fragment requires http(s), not file://). Keep index.html in sync with the
+  source whenever a feature or its cases change.
+
+Roadmap
+-------
+- unsubscribe support for reactive elements (x-if, x-for)
+- Shadow DOM / style encapsulation options
+- prop-change re-rendering (attributeChangedCallback)

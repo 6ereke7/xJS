@@ -1,4 +1,5 @@
-import sm = require('./core')
+import { sm } from './state'
+import { domReady } from './domReady'
 
 const registered = new Set<string>()
 
@@ -63,7 +64,7 @@ class Component extends HTMLElement {
 
 class If extends HTMLElement {
   private bound: Array<string> = []
-  private reRender: () => void = () => {}
+  private reRender: () => void = () => { }
 
   constructor() {
     super()
@@ -83,13 +84,14 @@ class If extends HTMLElement {
       this.hidden = !this.evaluate(condition)
     }
 
-    for (const name of this.bound) {
-      const state = sm.states[name]
-      // unsub not implemented yet; subscription leaks on disconnect
-      state?.sub({ type: 'normal', update: this.reRender, args: [] })
-    }
-
-    this.reRender()
+    domReady(() => {
+      for (const name of this.bound) {
+        const state = sm.states[name]
+        // unsub not implemented yet; subscription leaks on disconnect
+        state?.sub({ type: 'normal', update: this.reRender, args: [] })
+      }
+      this.reRender()
+    })
   }
 
   disconnectedCallback() {
@@ -107,7 +109,7 @@ class For extends HTMLElement {
   private template: string = ''
   private asName: string = 'val'
   private from: string = ''
-  private reRender: () => void = () => {}
+  private reRender: () => void = () => { }
 
   connectedCallback() {
     this.from = this.getAttribute('from') ?? ''
@@ -125,13 +127,14 @@ class For extends HTMLElement {
       this.render()
     }
 
-    for (const name of this.bound) {
-      const state = sm.states[name]
-      // unsub not implemented yet; subscription leaks on disconnect
-      state?.sub({ type: 'normal', update: this.reRender, args: [] })
-    }
-
-    this.reRender()
+    domReady(() => {
+      for (const name of this.bound) {
+        const state = sm.states[name]
+        // unsub not implemented yet; subscription leaks on disconnect
+        state?.sub({ type: 'normal', update: this.reRender, args: [] })
+      }
+      this.reRender()
+    })
   }
 
   disconnectedCallback() {
@@ -168,4 +171,4 @@ customElements.define('x-if', If)
 customElements.define('x-for', For)
 
 
-export = { Include, Component, If, For }
+export { Include, Component, If, For }

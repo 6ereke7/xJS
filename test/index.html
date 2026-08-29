@@ -2,64 +2,367 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8">
-  <meta http-equiv="X-UA-Compatible" content="IE=Edge">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-
-  <title>kelal-test</title>
-  <link rel="stylesheet" href="kelal.css">
+  <title>xJS - Feature Demo</title>
+  <style>
+    body { font-family: system-ui, sans-serif; max-width: 760px; margin: 40px auto; padding: 0 16px; color: #222; }
+    h1 { font-size: 1.6rem; }
+    h2 { margin-top: 40px; border-bottom: 1px solid #ddd; padding-bottom: 6px; }
+    .demo { border: 1px solid #eee; border-radius: 8px; padding: 16px; margin: 12px 0; }
+    .row { display: flex; gap: 8px; align-items: center; flex-wrap: wrap; }
+    button { cursor: pointer; padding: 6px 12px; }
+    input, select, textarea { padding: 6px 8px; }
+    code { background: #f4f4f4; padding: 1px 5px; border-radius: 4px; }
+    .muted { color: #888; font-size: 0.85rem; }
+    pre { background: #f4f4f4; padding: 10px; border-radius: 6px; overflow-x: auto; }
+    .case { border-left: 3px solid #bbb; padding-left: 10px; margin: 8px 0; }
+    .warn { color: #b58900; }
+  </style>
 </head>
-
 <body>
-  
-  <card 
-  style="--theme:dark" 
-  class="self-center">
-    
-    <h2 class="block self-center">Sing-in</h2>
-    <content class="center">
 
-      <input 
-      type="text" 
-      name="username" 
-      placeholder="@username"
-      class="block"/>
-      <input 
-      type="password" 
-      name="password" 
-      placeholder="xxxxx"
-      class="block">
+  <h1>xJS Feature Demo</h1>
+  <p class="muted">Keep this page open and watch the browser console. Every feature and edge case below is a manual test target; the <span class="warn">warn</span>/error messages are the expected behaviour to check.</p>
 
-      <div class="flex center">
-        <a href="#" class="fade pop">sign up</a> 
-          <hr />
-        <button class="pop bg-prime">
-         sign in
-        </button>
+  <!-- ===================== STATE (sm) ===================== -->
+  <h2>1. State (sm)</h2>
+  <div class="demo">
+    <div class="row">
+      <p id="count-readout">count = 0</p>
+      <button id="inc">+</button>
+      <button id="dec">-</button>
+      <button id="reset">reset</button>
+    </div>
+    <p class="muted">Plain JS subscriber (type "normal") updating the readout on every <code>set()</code>. Also exercises <code>sub()</code> returning <code>true</code>.</p>
+
+    <div class="case">
+      <p><strong>Case:</strong> <code>sm('missing')</code> returns <code>undefined</code> (not an error).</p>
+      <button id="get-missing">sm('missing').get()</button>
+      <span class="muted">-> check console for "missing state is undefined"</span>
+    </div>
+  </div>
+
+  <!-- ===================== DERIVED STATE ===================== -->
+  <h2>2. Derived state <span class="muted">(compute + deps)</span></h2>
+  <div class="demo">
+    <p><code>sm.new('first')</code> + <code>sm.new('last')</code>, then <code>sm.new('fullname', { compute, deps })</code>.</p>
+    <p>Derived value: <b id="fullname-readout">[fullname]</b></p>
+    <div class="row">
+      <input id="first-input" type="text" placeholder="first" />
+      <button id="first-apply">set first</button>
+      <input id="last-input" type="text" placeholder="last" />
+      <button id="last-apply">set last</button>
+    </div>
+    <p class="muted">Changing <code>first</code> or <code>last</code> recomputes <code>fullname</code> automatically (a normal subscriber logs the recomputed value).</p>
+
+    <div class="case">
+      <p><strong>Case:</strong> calling <code>set()</code> on a dependent state throws <code>"cannot set dependent state"</code>.</p>
+      <button id="set-dependent">sm('fullname').set('x')</button>
+      <span class="muted warn">-> check console: error is thrown &amp; caught</span>
+    </div>
+
+    <div class="case">
+      <p><strong>Case:</strong> subscriber <code>type: "dependent"</code> receives the <b>State object</b> (not the value); <code>type: "normal"</code> receives the value. See console under "fullname dependent sub".</p>
+    </div>
+  </div>
+
+  <!-- ===================== STATE EDGE CASES ===================== -->
+  <h2>3. State edge cases</h2>
+  <div class="demo">
+    <div class="case">
+      <p><strong><code>sm.del()</code>:</strong> deleting <code>temp</code> makes <code>sm('temp')</code> return <code>undefined</code>.</p>
+      <div class="row">
+        <button id="create-temp">sm.new('temp')</button>
+        <button id="del-temp">sm.del('temp')</button>
+        <button id="read-temp">read temp</button>
       </div>
-    </content>
-  </card>
-  
-  <glass class="self-center center">
-    <input 
-      type="text" 
-      name="username" 
-      placeholder="@username"
-      class="block pop"/>
-      <input 
-      type="password" 
-      name="password" 
-      placeholder="xxxxx"
-      class="block pop">
+      <p>temp readout: <b id="temp-readout">undefined</b></p>
+      <span class="muted">-> create-temp then read shows the value; after del-temp, read logs "temp is undefined".</span>
+    </div>
 
-      <div class="flex center">
-        <a href="#" class="fade pop">sign up</a> 
-          <hr />
-        <button class="pop bg-prime">
-         sign in
-        </button>
+    <div class="case">
+      <p><strong><code>onChange(update, args)</code>:</strong> registering a side-effect callback that receives the new value <b>plus extra args</b> on each <code>set()</code>.</p>
+      <div class="row">
+        <p id="effect-readout">effect: (none yet)</p>
+        <button id="effect-inc">set('ping')</button>
       </div>
-  </glass>
+      <p class="muted">onChange payload logged to console as <code>value, extraArg</code>.</p>
+    </div>
+  </div>
 
-  <script src="kelal.js"></script>
+  <!-- ===================== X-BIND ===================== -->
+  <h2>4. x-bind <span class="muted">(text binding)</span></h2>
+  <div class="demo">
+    <p><code>x-bind="name"</code> &rarr; Hello, <b x-bind="name">$name</b>!</p>
+    <div class="row">
+      <input id="name-input" type="text" placeholder="type a name" />
+      <button id="name-apply">bind</button>
+    </div>
+    <p><code>x-bind="name, missing"</code> &rarr; <b x-bind="name, missing">$name :: $missing</b></p>
+    <p class="muted">The second line references the nonexistent state <code>missing</code>; open the console to see the warning, while <code>$name</code> still binds.</p>
+
+    <div class="case">
+      <p><strong>Case:</strong> multiple states in one <code>x-bind</code>.</p>
+      <p><code>x-bind="name, count"</code> &rarr; <b x-bind="name, count">$name / count=$count</b></p>
+    </div>
+  </div>
+
+  <!-- ===================== X-MODEL ===================== -->
+  <h2>5. x-model <span class="muted">(two-way binding)</span></h2>
+  <div class="demo">
+    <div class="row">
+      <input id="model-input" type="text" x-model="username" placeholder="type here" />
+      <button id="model-set">set state to &quot;bound&quot;</button>
+    </div>
+    <p>Bound with <code>x-bind</code>: <b x-bind="username">$username</b></p>
+    <p class="muted">Type in the field and the <code>x-bind</code> text updates (input &rarr; state); click the button to set state and the field updates (state &rarr; input).</p>
+
+    <div class="case">
+      <p><strong>Case:</strong> <code>&lt;textarea&gt;</code> supports two-way binding too.</p>
+      <textarea id="model-textarea" x-model="note" rows="2" placeholder="type a note">$note</textarea>
+      <p>Note bound: <b x-bind="note">$note</b></p>
+    </div>
+
+    <div class="case">
+      <p><strong>Case:</strong> radio / checkbox / <code>&lt;select&gt;</code> are skipped with a console warning (not supported yet).</p>
+      <input type="checkbox" x-model="checkbox"> checkbox
+      <input type="radio" x-model="radio"> radio
+      <select x-model="pick">
+        <option>a</option>
+        <option>b</option>
+      </select>
+      <span class="muted warn">-> check console for 3 skip warnings</span>
+    </div>
+
+    <div class="case">
+      <p><strong>Case:</strong> <code>x-model</code> on a missing state logs a warning and is skipped without crashing.</p>
+      <input id="model-missing" type="text" x-model="noSuchState" placeholder="x-model on missing state">
+    </div>
+  </div>
+
+  <!-- ===================== X-COMPONENT ===================== -->
+  <h2>6. x-component</h2>
+  <div class="demo">
+    <pre>&lt;x-component name="greeting" props="Name"&gt;
+  &lt;h3&gt;Hello, $Name!&lt;/h3&gt;
+&lt;/x-component&gt;</pre>
+    <x-component name="greeting" props="Name">
+      <h3>Hello, $Name!</h3>
+    </x-component>
+    <div class="row">
+      <greeting Name="World"></greeting>
+      <greeting Name="xJS"></greeting>
+      <greeting></greeting>
+    </div>
+    <p class="muted">The last <code>&lt;greeting&gt;</code> has no <code>Name</code> attribute, so it renders with an empty value (missing prop &rarr; empty string).</p>
+
+    <div class="case">
+      <p><strong>Case:</strong> unknown <code>$Placeholder</code> is left untouched (not replaced).</p>
+      <x-component name="raw" props="A">
+        <h4>A=$A | B=$B</h4>
+      </x-component>
+      <raw A="1"></raw>
+    </div>
+
+    <div class="case">
+      <p><strong>Case:</strong> duplicate <code>name</code> registration is skipped (second definition ignored). Only the first template remains.</p>
+      <x-component name="dupe" props="V"><h4>FIRST: $V</h4></x-component>
+      <x-component name="dupe" props="V"><h4>SECOND: $V</h4></x-component>
+      <dupe V="hi"></dupe>
+    </div>
+
+    <div class="case">
+      <p><strong>Case:</strong> missing <code>name</code> attribute &rarr; no component is registered and no error is thrown.</p>
+      <x-component props="X"><h4>has props but no name</h4></x-component>
+    </div>
+  </div>
+
+  <!-- ===================== X-IF ===================== -->
+  <h2>7. x-if <span class="muted">(reactive toggle)</span></h2>
+  <div class="demo">
+    <button id="toggle">toggle panel</button>
+    <x-if condition="sm('isOpen').get()" x-bind="isOpen">
+      <div style="border:1px solid #4caf50; padding:12px; margin-top:12px; border-radius:6px;">
+        <p>This panel is visible because <code>sm('isOpen').get()</code> is truthy.</p>
+      </div>
+    </x-if>
+
+    <div class="case">
+      <p><strong>Case:</strong> <code>x-if</code> reacts to <b>multiple</b> bound states.</p>
+      <div class="row">
+        <button id="toggle-a">toggle A</button>
+        <button id="toggle-b">toggle B</button>
+      </div>
+      <p>Show when <code>flagA</code> OR <code>flagB</code> is true:</p>
+      <x-if condition="sm('flagA').get() || sm('flagB').get()" x-bind="flagA, flagB">
+        <div style="border:1px solid #2196f3; padding:12px; margin-top:12px; border-radius:6px;">
+          <p>Visible because a flag is on. (flagA=<code>sm('flagA').get()</code>, flagB=<code>sm('flagB').get()</code>)</p>
+        </div>
+      </x-if>
+    </div>
+
+    <div class="case">
+      <p><strong>Case:</strong> missing <code>condition</code> attribute &rarr; element stays hidden, no error.</p>
+      <x-if><p>should never show</p></x-if>
+    </div>
+  </div>
+
+  <!-- ===================== X-FOR ===================== -->
+  <h2>8. x-for <span class="muted">(reactive list)</span></h2>
+  <div class="demo">
+    <button id="add-item">add item</button>
+    <x-for from="sm('items').get()" as="item" x-bind="items">
+      <p>$item - #$index</p>
+    </x-for>
+
+    <div class="case">
+      <p><strong>Case:</strong> custom <code>as</code> name (default is <code>val</code>).</p>
+      <x-for from="sm('rows').get()" as="row" x-bind="rows">
+        <p>[row] $row</p>
+      </x-for>
+    </div>
+
+    <div class="case">
+      <p><strong>Case:</strong> missing/bad <code>from</code> expression &rarr; renders empty and does not crash.</p>
+      <x-for from="sm('nope').get().map(x => x)">
+        <p>should never render</p>
+      </x-for>
+      <p class="muted">This evaluates <code>undefined.map(...)</code>; the try/catch swallows it and renders nothing. Check console is clean (no error thrown).</p>
+    </div>
+
+    <div class="case">
+      <p><strong>Case:</strong> empty / null iterable renders nothing.</p>
+      <x-for from="sm('emptyList').get()" as="e" x-bind="emptyList"><p>$e</p></x-for>
+    </div>
+  </div>
+
+  <!-- ===================== X-INCLUDE ===================== -->
+  <h2>9. x-include</h2>
+  <div class="demo">
+    <x-include src="fragment.html"></x-include>
+    <p class="muted">Requires serving over http(s); the page won't fetch the fragment when opened via <code>file://</code>.</p>
+
+    <div class="case">
+      <p><strong>Case:</strong> failed / missing source logs an error to the console (and leaves the element empty).</p>
+      <x-include src="does-not-exist.html"></x-include>
+      <code>src="does-not-exist.html"</code>
+    </div>
+
+    <div class="case">
+      <p><strong>Case:</strong> no <code>src</code> attribute &rarr; no fetch is attempted, no error.</p>
+      <x-include></x-include>
+    </div>
+  </div>
+
+  <script src="core.browser.js"></script>
+  <script>
+    // ============ state init ============
+    sm.new('name', { value: 'xJS' })
+    sm.new('count', { value: 0 })
+    sm.new('isOpen', { value: true })
+    sm.new('items', { value: ['apple', 'banana', 'cherry'] })
+    sm.new('username', { value: 'bound' })
+
+    // derived state (section 2)
+    sm.new('first', { value: 'Ada' })
+    sm.new('last', { value: 'Lovelace' })
+    sm.new('fullname', {
+      compute: () => sm('first').get() + ' ' + sm('last').get(),
+      deps: [sm('first'), sm('last')],
+      onChange: (v) => console.log('fullname recomputed ->', v),
+    })
+    sm('fullname').sub({
+      type: 'dependent',
+      update: (s) => console.log('[dependent sub] got State object named', s && s.constructor && s.get && s.get ? 'fullname' : '?', 'value =', s.get()),
+      args: [],
+    })
+    sm('fullname').sub({
+      type: 'normal',
+      update: (v) => console.log('[normal sub] got value =', v),
+      args: [],
+    })
+
+    // state edge cases (section 3)
+    sm.new('effect', { value: '' })
+    sm.new('rows', { value: ['r1', 'r2'] })
+    sm.new('emptyList', { value: [] })
+
+    function refreshFullname() {
+      const el = document.getElementById('fullname-readout')
+      if (el) el.textContent = '[' + sm('fullname').get() + ']'
+    }
+    refreshFullname()
+
+    // ============ section 1: state ============
+    const readout = document.getElementById('count-readout')
+    const renderCount = () => { readout.textContent = `count = ${sm('count').get()}` }
+    sm('count').sub({ type: 'normal', update: renderCount, args: [] })
+    document.getElementById('inc').addEventListener('click', () => sm('count').set(sm('count').get() + 1))
+    document.getElementById('dec').addEventListener('click', () => sm('count').set(sm('count').get() - 1))
+    document.getElementById('reset').addEventListener('click', () => sm('count').set(0))
+    renderCount()
+
+    document.getElementById('get-missing').addEventListener('click', () => {
+      const s = sm('missing')
+      console.log('sm("missing") is', s, '-> so .get() on undefined:', s === undefined ? 'cannot call (expected)' : s.get())
+    })
+
+    // ============ section 2: derived ============
+    const applyFirst = () => { sm('first').set(document.getElementById('first-input').value || 'Ada'); refreshFullname() }
+    const applyLast = () => { sm('last').set(document.getElementById('last-input').value || 'Lovelace'); refreshFullname() }
+    document.getElementById('first-apply').addEventListener('click', applyFirst)
+    document.getElementById('last-apply').addEventListener('click', applyLast)
+
+    document.getElementById('set-dependent').addEventListener('click', () => {
+      try {
+        sm('fullname').set('forbidden')
+        console.log('UNEXPECTED: dependent set did not throw')
+      } catch (e) {
+        console.log('expected throw:', e.message)
+      }
+    })
+
+    // ============ section 3: state edge cases ============
+    const tempReadout = document.getElementById('temp-readout')
+    const readTemp = () => {
+      const s = sm('temp')
+      tempReadout.textContent = s === undefined ? 'undefined' : String(s.get())
+      console.log('sm("temp") is', s === undefined ? 'undefined' : s.get())
+    }
+    document.getElementById('create-temp').addEventListener('click', () => { sm.new('temp', { value: 'hello temp' }); readTemp() })
+    document.getElementById('del-temp').addEventListener('click', () => { sm.del('temp'); readTemp() })
+    document.getElementById('read-temp').addEventListener('click', readTemp)
+
+    const effectReadout = document.getElementById('effect-readout')
+    const extra = ['EXTRA-ARG']
+    sm('effect').onChange((value, ...args) => {
+      effectReadout.textContent = `effect: ${value}`
+      console.log('onChange fired with value =', value, 'and extra args =', args)
+    }, extra)
+    document.getElementById('effect-inc').addEventListener('click', () => sm('effect').set('ping'))
+
+    // ============ section 4: x-bind ============
+    const applyName = () => sm('name').set(document.getElementById('name-input').value || 'xJS')
+    document.getElementById('name-apply').addEventListener('click', applyName)
+    document.getElementById('name-input').addEventListener('keydown', (e) => { if (e.key === 'Enter') applyName() })
+
+    // ============ section 5: x-model ============
+    sm.new('note', { value: '' })
+    document.getElementById('model-set').addEventListener('click', () => sm('username').set('bound'))
+
+    // ============ section 7: x-if ============
+    sm.new('flagA', { value: false })
+    sm.new('flagB', { value: false })
+    document.getElementById('toggle').addEventListener('click', () => sm('isOpen').set(!sm('isOpen').get()))
+    document.getElementById('toggle-a').addEventListener('click', () => sm('flagA').set(!sm('flagA').get()))
+    document.getElementById('toggle-b').addEventListener('click', () => sm('flagB').set(!sm('flagB').get()))
+
+    // ============ section 8: x-for ============
+    let itemIndex = 4
+    document.getElementById('add-item').addEventListener('click', () => {
+      const items = [...sm('items').get(), `item-${itemIndex++}`]
+      sm('items').set(items)
+    })
+  </script>
 </body>
 </html>

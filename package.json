@@ -15,8 +15,7 @@
   "type": "commonjs",
   "main": "dist/index.js",
   "scripts": {
-    "test": "npm run build && node --test \"test/**/*.test.cjs\"",
-    "build": "node ./node_modules/typescript/bin/tsc"
+    "build": "bash ./build.sh"
   },
   "devDependencies": {
     "typescript": "^5.9.3"

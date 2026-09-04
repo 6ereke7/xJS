@@ -10,7 +10,7 @@ export interface subInterface {
   update: Function;
   args: Array<State>
 }
-class State {
+export class State {
   #name: string;
   #value: any;
   #updateFunc: Function;
@@ -99,5 +99,5 @@ sm.del = (name: string): boolean => {
 }
 
 if (typeof globalThis !== "undefined") {
-  ;(globalThis as Record<string, unknown>).sm = sm
+  ; (globalThis as Record<string, unknown>).sm = sm
 }

@@ -1,15 +1,19 @@
-#!/usr/bin/env bash
-set -euo pipefail
+import * as esbuild from 'esbuild'
 
-npx tsc --noEmit
-
-BARREL="$(mktemp --suffix=.ts)"
-trap 'rm -f "$BARREL"' EXIT
-
-for f in "$(pwd)"/src/*.ts; do
-  printf 'export * from "%s"\n' "${f%.ts}" >> "$BARREL"
-done
-
-npx esbuild "$BARREL" --bundle --format=cjs --outfile=dist/core.js
-
-npx esbuild "$BARREL" --bundle --platform=browser --format=iife --global-name=xJS --outfile=dist/core.browser.js
+const args = process.argv.slice(2)
+const opt = {
+  entryPoints: ['./src/core.ts'],
+  bundle: true,
+  outfile: './test/core.browser.js',
+  format: 'iife',
+  target: 'esnext',
+  minify: true,
+}
+if (args.includes("-d")) {
+  const ctx = await esbuild.context(opt)
+  console.log('auto build running')
+  await ctx.watch()
+  console.log('watch has ended')
+} else {
+  await esbuild.build(opt)
+}

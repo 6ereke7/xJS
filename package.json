@@ -15,9 +15,11 @@
   "type": "commonjs",
   "main": "dist/index.js",
   "scripts": {
-    "build": "bash ./build.sh"
+    "build": "node ./build.mjs",
+    "dev": "node ./build.mjs -d & python -m http.server -d test"
   },
   "devDependencies": {
+    "esbuild": "^0.28.2",
     "typescript": "^5.9.3"
   }
 }

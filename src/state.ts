@@ -1,15 +1,5 @@
-interface optionsInterface {
-  value: any;
-  onChange?: Function;
-  args?: Array<State>;
-  compute?: Function;
-  deps?: Array<State>;
-}
-export interface subInterface {
-  type: "normal" | "dependent";
-  update: Function;
-  args: Array<State>
-}
+import type { optionsInterface, smInterface, subInterface } from "./interfaces"
+
 export class State {
   #name: string;
   #value: any;
@@ -77,12 +67,6 @@ export class State {
   }
 }
 
-interface smInterface {
-  (state: string): State | undefined;
-  states: Record<string, State>
-  new: Function;
-  del: Function;
-}
 export const sm: smInterface = (state) => {
   if (state) {
     return sm.states[state]

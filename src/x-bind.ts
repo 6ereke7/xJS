@@ -1,4 +1,5 @@
-import { sm, State, type subInterface } from "./state"
+import { sm, State } from "./state"
+import type { subInterface } from "./interfaces"
 import { bindToDict, domReady, scriptToValue } from "./helper"
 
 export function bind(root: Document | Element) {

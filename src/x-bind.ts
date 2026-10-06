@@ -1,20 +1,32 @@
 import { sm, State } from "./state"
 import type { subInterface } from "./interfaces"
-import { bindToDict, domReady, scriptToValue } from "./helper"
+import { bindToDict, domReady, log, scriptToValue } from "./helper"
 
 export function bind(root: Document | Element) {
   const selector: string = "[x-bind]:not([bound]), [x-model]:not([bound])"
   root.querySelectorAll(selector).forEach(el => {
-    if (el.hasAttribute('x-bind')) bindText(el)
+    if (el.hasAttribute('x-bind')) {
+      bindTextAndAttr(el)
+    }
     if (el.hasAttribute('x-model')) bindModel(el as HTMLInputElement)
 
   })
-  function bindText(el: Element) {
+  function bindTextAndAttr(el: Element) {
     const states = bindToDict(el.getAttribute('x-bind') ?? '')
     var content = scriptToValue(el.innerHTML, states)
+    var attrMap = {}
+    for (var i = 0; i < el.attributes.length; i++) {
+      if (el.attributes[i]?.name !== undefined) {
+        attrMap[el.attributes[i]?.name] = scriptToValue(el.attributes[i]?.value, states)
+      }
+    }
     const reRender = () => {
       content = scriptToValue(content.old, states)
       el.innerHTML = content.new
+      for (let [attr, val] of Object.entries(attrMap)) {
+        val = scriptToValue(val.old, states)
+        el.setAttribute(attr, val.new)
+      }
     }
     reRender()
 

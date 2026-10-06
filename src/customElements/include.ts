@@ -4,13 +4,18 @@ import { bind } from "../x-bind"
 class Include extends HTMLElement {
   private src: string = ''
   private controller: AbortController | undefined
-
+  static observedAttributes = ['src']
   connectedCallback() {
     this.src = this.getAttribute('src') ?? ''
     if (!this.src || this.hasAttribute('bound')) return
     void this.load()
   }
 
+  attributeChangedCallback(name:string,oldVal:string ,newVal:string){
+    if(name !== 'src' || oldVal === newVal) return;
+    this.src = newVal 
+    void this.load()
+  }
   disconnectedCallback() {
     this.controller?.abort()
     this.controller = undefined

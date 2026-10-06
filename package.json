@@ -13,7 +13,9 @@
   "license": "ISC",
   "author": "Bereket Tadese",
   "type": "commonjs",
-  "main": "dist/index.js",
+  "main": "dist/x.js",
+  "files":["dist"],
+  "jsdelivr":"dist/x.js",
   "scripts": {
     "build": "node ./build.mjs",
     "dev": "node ./build.mjs -d & python -m http.server -d test"

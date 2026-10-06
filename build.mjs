@@ -4,7 +4,7 @@ const args = process.argv.slice(2)
 const opt = {
   entryPoints: ['./src/core.ts'],
   bundle: true,
-  outfile: './dist/core.js',
+  outfile: './dist/x.js',
   format: 'iife',
   target: 'esnext',
   minify: true,
